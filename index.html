@@ -21,20 +21,20 @@
 </head>
 <body>
   <h1>Absensi Kehadiran</h1>
-  <input type="text" id="inputNama" placeholder="Masukkan nomor/nama"><br>
+  <input type="text" id="inputNIS" placeholder="Masukkan NIS"><br>
   <button onclick="absenMasuk()">Masuk</button>
   <div class="log" id="log"></div>
 
   <script>
-    // ✅ GUNAKAN LINK CSV, bukan pubhtml
-    const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSk7IfXJ8PeG6s0rY-kGZwNUmjZHixJw2FruQLzUVmeWDw3MaM6EFTeLi2CtP4iTDN-DHJpnCI3aIi0/pub?output=csv&gid=835708808';
+    // Link CSV dari Google Spreadsheet
+    const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRjI7HFt1SP1zvH4op-fGN4U0oME2vlKmGro9prx7wrmXXAXI5jd5lafsFJnWnZ14S6iN0IUZ1gLKBR/pubhtml';
 
     async function absenMasuk() {
-      const input = document.getElementById("inputNama").value.trim().toLowerCase();
+      const input = document.getElementById("inputNIS").value.trim();
       const log = document.getElementById("log");
 
       if (!input) {
-        log.innerText = "⚠️ Masukkan nama atau nomor absen terlebih dahulu!";
+        log.innerText = "⚠️ Masukkan NIS terlebih dahulu!";
         return;
       }
 
@@ -45,23 +45,23 @@
         const csvText = await res.text();
         const rows = csvText.split("\n").map(row => row.split(","));
 
-        // Lewati baris header, mulai dari baris ke-2
+        // Lewati header
         let ditemukan = false;
         for (let i = 1; i < rows.length; i++) {
-          const absen = rows[i][0]?.trim().toLowerCase();
-          const nama = rows[i][1]?.trim().toLowerCase();
+          const nis = rows[i][1]?.trim(); // Kolom B = NIS
+          const nama = rows[i][2]?.trim(); // Kolom C = Nama
 
-          if (input === absen || input === nama) {
+          if (input === nis) {
             const now = new Date();
             const waktu = now.toLocaleString("id-ID");
-            log.innerText = `✅ ${rows[i][0]} - ${rows[i][1]} tercatat hadir pada ${waktu}`;
+            log.innerText = `✅ ${nis} - ${nama} tercatat hadir pada ${waktu}`;
             ditemukan = true;
             break;
           }
         }
 
         if (!ditemukan) {
-          log.innerText = "❌ Nama atau nomor absen tidak ditemukan!";
+          log.innerText = "❌ NIS tidak ditemukan dalam daftar!";
         }
       } catch (err) {
         log.innerText = "⚠️ Gagal mengambil data dari spreadsheet.";
